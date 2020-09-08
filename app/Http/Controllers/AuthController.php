@@ -15,10 +15,9 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $this->validate($request, [
-            'email' => ['required', 'email'],
-            'password' => ['required', 'min:8'],
-        ], [
-            '*' => trans('auth.failed'),
+            'email' => ['sometimes', 'required', 'email'],
+            'password' => ['sometimes', 'required', 'min:8'],
+            'token' => ['sometimes', 'required'],
         ]);
 
         $credentials = $request->only('email', 'password');
@@ -27,6 +26,21 @@ class AuthController extends Controller
             $request->offsetSet('email', $request->email);
 
             $credentials = $request->only('email', 'password');
+        }
+
+        // Attempt login with token
+        if ($request->input('token')) {
+            $this->auth->createToken($request->input('token'));
+
+            $user = $this->auth->authenticate();
+
+            if ($user) {
+                return response()->json([
+                    'success' => true,
+                    'data'    => $request->user(),
+                    'token'   => $request->input('token')
+                ], 200);
+            }
         }
 
         if (Auth::attempt($credentials)) {

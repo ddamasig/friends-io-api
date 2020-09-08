@@ -37,4 +37,22 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Returns the related UserSocial model
+     */
+    public function social()
+    {
+        return $this->hasMany(UserSocial::class, 'user_id', 'id');
+    }
+
+    /**
+     * Returns true if the user has a linked account to a specific service.
+     */
+    public function hasSocialLinked($service)
+    {
+        return (bool) $this->social()
+            ->where('service', $service)
+            ->count();
+    }
 }

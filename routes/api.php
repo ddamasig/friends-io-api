@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', 'AuthController@login')->name('login');
 
+Route::get('/login/{service}', 'SocialLoginController@redirect');
+Route::get('/login/{service}/callback', 'SocialLoginController@callback');
+
 Route::group([
     'middleware'    => ['auth:sanctum']
 ], function () {
