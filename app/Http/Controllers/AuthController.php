@@ -30,16 +30,10 @@ class AuthController extends Controller
 
         // Attempt login with token
         if ($request->input('token')) {
-            $this->auth->createToken($request->input('token'));
-
             $user = $this->auth->authenticate();
 
             if ($user) {
-                return response()->json([
-                    'success' => true,
-                    'data'    => $request->user(),
-                    'token'   => $request->input('token')
-                ], 200);
+                return $this->respondWithToken($request);
             }
         }
 
