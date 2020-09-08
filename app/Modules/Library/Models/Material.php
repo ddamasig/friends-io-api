@@ -2,7 +2,7 @@
 
 namespace Library\Models;
 
-use App\User;
+use Core\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class Material extends Model

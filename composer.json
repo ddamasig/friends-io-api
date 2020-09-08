@@ -46,8 +46,8 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/",
-            "Core\\": "app/modules/Core",
-            "Library\\": "app/modules/Library"
+            "Core\\": "app/Modules/Core",
+            "Library\\": "app/Modules/Library"
         }
     },
     "minimum-stability": "dev",
