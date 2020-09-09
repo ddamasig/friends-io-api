@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Post\Models\Post;
 use Post\Resources\PostResource;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -50,12 +52,18 @@ class PostsController extends Controller
     public function store(Request $request): JsonResource
     {
         $this->validate($request, [
-            'parent_id' => ['integer'],
             'title' => ['required', 'max:256'],
             'description' => ['required', 'max: 2048'],
-            'date_published' => ['required', 'date'],
+            'images' => ['sometimes', 'image'],
+            'friend_ids' => ['sometimes', 'array', 'exists:users,id'],
         ]);
 
+        DB::transaction(function () use ($request) {
+            $post = Post::create([
+                'description' => $request->description,
+                'uploader_id' => Auth::user()->getKey()
+            ]);
+        });
         return new PostResource(
             Post::create($request->all())
         );

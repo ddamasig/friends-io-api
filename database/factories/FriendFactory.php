@@ -2,11 +2,9 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
+use Core\Models\Friend;
 use Core\Models\User;
 use Faker\Generator as Faker;
-use Illuminate\Support\Str;
-use phpDocumentor\Reflection\DocBlock\Tag;
-use Post\Models\Post;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,17 +17,9 @@ use Post\Models\Post;
 |
 */
 
-$factory->define(Post::class, function (Faker $faker) {
+$factory->define(Friend::class, function (Faker $faker) {
     return [
-        'title' => $faker->sentence(rand(1,10)),
-        'description' => $faker->paragraph(rand(3,4)),
-        'uploader_id' => factory(User::class)->create()->getKey(),
-    ];
-});
-
-$factory->define(Tag::class, function (Faker $faker) {
-    return [
-        'post_id' => factory(Post::class)->create()->getKey(),
-        'user_id' => factory(User::class)->create()->getKey(),
+        'owner_id' => factory(User::class)->create()->getKey(),
+        'user_id' => factory(User::class)->create()->getKey()
     ];
 });

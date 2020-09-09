@@ -24,7 +24,8 @@ Route::group([
 ], function () {
     Route::post('logout', 'AuthController@logout')->name('logout');
     Route::post('refresh', 'AuthController@refresh')->name('refresh');
-    Route::get('profile', 'AuthController@profile')->name('profile');
+    Route::get('profile', 'ProfileController@profile')->name('profile');
+    Route::get('friends', 'ProfileController@friends')->name('friends');
 
     Route::group([
         'namespace' => 'Core',

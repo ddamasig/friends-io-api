@@ -92,12 +92,4 @@ class AuthController extends Controller
             'token_type' => 'Bearer',
         ]);
     }
-
-    /**
-     * Returns the logged in user
-     */
-    public function profile(): JsonResource
-    {
-        return new UserResource(Auth::user());
-    }
 }

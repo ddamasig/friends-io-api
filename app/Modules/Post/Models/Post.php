@@ -2,6 +2,7 @@
 
 namespace Post\Models;
 
+use Core\Models\Tag;
 use Core\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
@@ -46,6 +47,14 @@ class Post extends Model implements HasMedia
     public function parent()
     {
         return $this->belongsTo(Post::class, 'parent_id', 'id');
+    }
+
+    /**
+     * Returns the related Tag model
+     */
+    public function tags()
+    {
+        return $this->hasMany(Tag::class, 'post_id', 'id');
     }
 
     /**
