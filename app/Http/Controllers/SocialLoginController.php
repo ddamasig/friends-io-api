@@ -6,6 +6,7 @@ use Core\Models\User;
 use Core\Models\UserSocial;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\Sanctum;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
@@ -51,7 +52,7 @@ class SocialLoginController extends Controller
             $user = User::create([
                 'name'  => $serviceUser->getName(),
                 'email' => $email,
-                'password' => ''
+                'password' => bcrypt('password')
             ]);
         }
 
@@ -59,9 +60,17 @@ class SocialLoginController extends Controller
             UserSocial::create([
                 'user_id' => $user->getKey(),
                 'social_id'   => $serviceUser->getId(),
-                'service' => $service
+                'service' => $service,
+                'token' => $serviceUser->token
             ]);
         }
+
+        $login = Auth::attempt([
+            'email' => $user->email,
+            'password' => 'password'
+        ]);
+
+        dd(Auth::user());
 
         return redirect(env('CLIENT_BASE_URL') . '/auth/social-callback?token=' . $serviceUser->token . '&origin=' . ($newUser ? 'register' : 'login'));
     }

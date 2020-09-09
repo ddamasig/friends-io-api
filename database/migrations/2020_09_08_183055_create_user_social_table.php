@@ -18,6 +18,7 @@ class CreateUserSocialTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->string('social_id')->nullable();
             $table->string('service');
+            $table->string('token');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users');

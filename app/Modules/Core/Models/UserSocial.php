@@ -11,7 +11,8 @@ class UserSocial extends Model
     protected $fillable = [
         'user_id',
         'social_id',
-        'service'
+        'service',
+        'token'
     ];
 
     public function user()
