@@ -6,16 +6,15 @@ use Core\Models\User;
 use Core\Models\UserSocial;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Laravel\Sanctum\Sanctum;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\InvalidStateException;
+use Tymon\JWTAuth\JWTAuth;
 
 class SocialLoginController extends Controller
 {
     protected $auth;
 
-    public function __construct(Sanctum $auth)
+    public function __construct(JWTAuth $auth)
     {
         /**
          * Pass the JWT object
@@ -65,14 +64,7 @@ class SocialLoginController extends Controller
             ]);
         }
 
-        $login = Auth::attempt([
-            'email' => $user->email,
-            'password' => 'password'
-        ]);
-
-        dd(Auth::user());
-
-        return redirect(env('CLIENT_BASE_URL') . '/auth/social-callback?token=' . $serviceUser->token . '&origin=' . ($newUser ? 'register' : 'login'));
+        return redirect(env('CLIENT_BASE_URL') . '/auth/social-callback?token=' . $this->auth->fromUser($user) . '&origin=' . ($newUser ? 'register' : 'login'));
     }
 
     public function needsToCreateSocial(User $user, $service)

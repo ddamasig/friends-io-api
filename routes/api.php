@@ -20,8 +20,10 @@ Route::get('/login/{service}', 'SocialLoginController@redirect');
 Route::get('/login/{service}/callback', 'SocialLoginController@callback');
 
 Route::group([
-    'middleware'    => ['auth:sanctum']
+    'middleware'    => ['auth:api']
 ], function () {
+    Route::post('logout', 'AuthController@logout')->name('logout');
+    Route::post('refresh', 'AuthController@refresh')->name('refresh');
     Route::get('profile', 'AuthController@profile')->name('profile');
 
     Route::group([
