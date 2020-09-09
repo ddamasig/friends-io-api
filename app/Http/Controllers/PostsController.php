@@ -1,52 +1,51 @@
 <?php
 
-namespace App\Http\Controllers\Library;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
-use Library\Models\Material;
-use Library\Resources\MaterialResource;
+use Post\Models\Post;
+use Post\Resources\PostResource;
 use Spatie\QueryBuilder\QueryBuilder;
 
-class MaterialsController extends Controller
+class PostsController extends Controller
 {
     /**
-     * Returns a collection of Material models
+     * Returns a collection of Post models
      */
     public function index(Request $request): JsonResource
     {
-        $query = QueryBuilder::for(Material::class)
+        $query = QueryBuilder::for(Post::class)
             ->allowedFilters([
                 'title',
                 'description',
-                'parent_id',
-                'author.fullname'
+                'uploader_id',
             ])
             ->allowedSorts([
                 'title',
-                'author.fullname',
-                'rating'
+                'description',
+                'uploader_id',
             ])
             ->allowedIncludes([
-                'uploader',
-                'parent'
-            ]);
+                'uploader'
+            ])
+            ->jsonPaginate();
 
-        return MaterialResource::collection($query);
+        return PostResource::collection($query);
     }
 
     /**
-     * Returns a specific of Material models
+     * Returns a specific of Post models
      */
-    public function show(Material $material): JsonResource
+    public function show(Post $post): JsonResource
     {
-        return new MaterialResource($material);
+        return new PostResource($post);
     }
 
     /**
-     * Creates a new Material model
+     * Creates a new Post model
      */
     public function store(Request $request): JsonResource
     {
@@ -57,15 +56,15 @@ class MaterialsController extends Controller
             'date_published' => ['required', 'date'],
         ]);
 
-        return new MaterialResource(
-            Material::create($request->all())
+        return new PostResource(
+            Post::create($request->all())
         );
     }
 
     /**
-     * Updates an existing Material model
+     * Updates an existing Post model
      */
-    public function update(Request $request, Material $material): JsonResource
+    public function update(Request $request, Post $post): JsonResource
     {
         $this->validate($request, [
             'parent_id' => ['integer'],
@@ -74,17 +73,17 @@ class MaterialsController extends Controller
             'date_published' => ['required', 'date'],
         ]);
 
-        return new MaterialResource(
-            tap($material)->update($request->all())
+        return new PostResource(
+            tap($post)->update($request->all())
         );
     }
 
     /**
-     * Deletes an existing Material model
+     * Deletes an existing Post model
      */
-    public function destroy(Material $material): Response
+    public function destroy(Post $post): Response
     {
-        $material->delete();
+        $post->delete();
 
         return response([], 204);
     }

@@ -34,11 +34,5 @@ Route::group([
         Route::apiResource('users', 'UsersController');
     });
 
-    Route::group([
-        'namespace' => 'Library',
-        'prefix'    => 'library',
-        'as'    => 'library.'
-    ], function () {
-        // Route::apiResource('materials', 'MaterialController');
-    });
+    Route::apiResource('posts', 'PostsController');
 });
