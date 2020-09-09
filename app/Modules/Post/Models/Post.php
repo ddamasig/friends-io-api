@@ -17,11 +17,8 @@ class Post extends Model implements HasMedia
      */
 
     public $fillable = [
-        'parent_id',
         'uploader_id',
-        'title',
         'description',
-        'date_published'
     ];
 
     /**

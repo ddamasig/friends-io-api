@@ -27,6 +27,8 @@ Route::group([
     Route::get('profile', 'ProfileController@profile')->name('profile');
     Route::get('friends', 'ProfileController@friends')->name('friends');
 
+    Route::apiResource('posts', 'PostsController');
+
     Route::group([
         'namespace' => 'Core',
         'prefix'    => 'core',
@@ -34,6 +36,4 @@ Route::group([
     ], function () {
         Route::apiResource('users', 'UsersController');
     });
-
-    Route::apiResource('posts', 'PostsController');
 });

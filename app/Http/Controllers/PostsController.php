@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Core\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
@@ -25,14 +26,10 @@ class PostsController extends Controller
                 'description',
                 'uploader_id',
             ])
-            ->allowedSorts([
-                'title',
-                'description',
-                'uploader_id',
-            ])
             ->allowedIncludes([
                 'uploader'
             ])
+            ->orderBy('created_at', 'desc')
             ->jsonPaginate();
 
         return PostResource::collection($query);
@@ -52,21 +49,20 @@ class PostsController extends Controller
     public function store(Request $request): JsonResource
     {
         $this->validate($request, [
-            'title' => ['required', 'max:256'],
             'description' => ['required', 'max: 2048'],
             'images' => ['sometimes', 'image'],
             'friend_ids' => ['sometimes', 'array', 'exists:users,id'],
         ]);
 
-        DB::transaction(function () use ($request) {
-            $post = Post::create([
+
+        $post = DB::transaction(function () use ($request) {
+            return Post::create([
                 'description' => $request->description,
                 'uploader_id' => Auth::user()->getKey()
             ]);
         });
-        return new PostResource(
-            Post::create($request->all())
-        );
+
+        return new PostResource($post);
     }
 
     /**

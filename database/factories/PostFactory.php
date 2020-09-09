@@ -21,7 +21,6 @@ use Post\Models\Post;
 
 $factory->define(Post::class, function (Faker $faker) {
     return [
-        'title' => $faker->sentence(rand(1,10)),
         'description' => $faker->paragraph(rand(3,4)),
         'uploader_id' => factory(User::class)->create()->getKey(),
     ];
