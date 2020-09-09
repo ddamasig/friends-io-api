@@ -2,68 +2,102 @@
 
 namespace App\Http\Controllers;
 
+use Core\Resources\UserResource;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
+    protected $auth;
+
+    /**
+     * Create a new AuthController instance.
+     *
+     * @return void
+     */
+    public function __construct(JWTAuth $auth)
+    {
+        $this->middleware('auth:api', ['except' => ['login']]);
+        $this->auth = $auth;
+    }
+
+    /**
+     * Attempt to authenticate the user using the credentials
+     */
     public function login(Request $request)
     {
         $this->validate($request, [
-            'username' => ['required', 'min:5'],
-            'password' => ['required', 'min:6'],
-        ], [
-            '*' => trans('auth.failed'),
+            'email' => ['sometimes', 'required', 'email'],
+            'password' => ['sometimes', 'required', 'min:8'],
+            'token' => ['sometimes', 'required'],
         ]);
 
-        $credentials = $request->only('username', 'password');
+        $credentials = $request->only('email', 'password');
 
-        if (filter_var($request->username, FILTER_VALIDATE_EMAIL)) {
-            $request->offsetSet('email', $request->username);
+        if ($request->input('token')) {
+            $this->auth->setToken($request->input('token'));
 
-            $credentials = $request->only('email', 'password');
-        }
+            $user = $this->auth->authenticate();
 
-        if (Auth::attempt($credentials)) {
-            if (Auth::user()->isDisabled() || !Auth::user()->isActivated()) {
-                return response()->json([
-                    'message' => trans('auth.disabled'),
-                ], 401);
+            if ($user) {
+                return $this->respondWithToken($request);
             }
-
-            return $this->respondWithToken($request);
         }
 
-        return response()->json([
-            'message' => trans('auth.failed'),
-        ], 401);
+        $token = auth('api')->attempt($credentials);
+
+        if (!$token) {
+            return response()->json([
+                'error' => [
+                    'message' => 'Email and password did not match. Please try again.'
+                ]
+            ], 401);
+        }
+
+        return $this->respondWithToken($token);
     }
 
-    public function logout(Request $request)
+    /**
+     * Log the user out (Invalidate the token).
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function logout()
     {
-        $user = request()->user();
+        auth()->logout();
 
-        $user->tokens()->where('id', $user->currentAccessToken()->getKey())->delete();
+        return response()->json(['message' => 'Successfully logged out']);
+    }
 
-        return response([], 204);
+    /**
+     * Refresh a token.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function refresh()
+    {
+        return $this->respondWithToken(auth()->refresh());
     }
 
     /**
      * Respond with a jwt bearer token.
-     *
-     * @param string $token
-     *
-     * @return [type] [description]
      */
-    protected function respondWithToken(Request $request)
+    protected function respondWithToken($token)
     {
-        $user = $request->user();
-
-        $client = $user->createToken('Authentication Token');
-
         return response()->json([
-            'access_token' => $client->plainTextToken,
+            'access_token' => $token,
             'token_type' => 'Bearer',
         ]);
+    }
+
+    /**
+     * Returns the logged in user
+     */
+    public function profile(): JsonResource
+    {
+        return new UserResource(Auth::user());
     }
 }

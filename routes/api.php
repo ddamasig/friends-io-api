@@ -16,15 +16,22 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('login', 'AuthController@login')->name('login');
 
+Route::get('/login/{service}', 'SocialLoginController@redirect');
+Route::get('/login/{service}/callback', 'SocialLoginController@callback');
+
 Route::group([
-    'middleware'    => ['auth:sanctum']
+    'middleware'    => ['auth:api']
 ], function () {
+    Route::post('logout', 'AuthController@logout')->name('logout');
+    Route::post('refresh', 'AuthController@refresh')->name('refresh');
+    Route::get('profile', 'AuthController@profile')->name('profile');
+
     Route::group([
         'namespace' => 'Core',
         'prefix'    => 'core',
         'as'    => 'core.'
     ], function () {
-        Route::apiResource('users', 'UserController');
+        Route::apiResource('users', 'UsersController');
     });
 
     Route::group([
@@ -32,6 +39,6 @@ Route::group([
         'prefix'    => 'library',
         'as'    => 'library.'
     ], function () {
-        Route::apiResource('materials', 'MaterialController');
+        // Route::apiResource('materials', 'MaterialController');
     });
 });
