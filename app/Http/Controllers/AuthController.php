@@ -50,7 +50,11 @@ class AuthController extends Controller
         $token = auth('api')->attempt($credentials);
 
         if (!$token) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json([
+                'error' => [
+                    'message' => 'Email and password did not match. Please try again.'
+                ]
+            ], 401);
         }
 
         return $this->respondWithToken($token);
