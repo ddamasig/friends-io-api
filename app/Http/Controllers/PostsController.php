@@ -9,6 +9,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Post\Models\Like;
 use Post\Models\Post;
 use Post\Resources\PostResource;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -50,16 +52,44 @@ class PostsController extends Controller
     {
         $this->validate($request, [
             'description' => ['required', 'max: 2048'],
-            'images' => ['sometimes', 'image'],
+            'images' => ['sometimes', 'array'],
             'friend_ids' => ['sometimes', 'array', 'exists:users,id'],
         ]);
 
 
+        /**
+         * Wrap inside transaction to access database rollback feature when something goes wrong
+         */
         $post = DB::transaction(function () use ($request) {
-            return Post::create([
+            /**
+             * Create the Post intance
+             */
+            $post = Post::create([
                 'description' => $request->description,
                 'uploader_id' => Auth::user()->getKey()
             ]);
+
+            /**
+             * Loop through each image
+             */
+            foreach ($request->images as $image) {
+                /**
+                 * Validate the image
+                 */
+                Validator::make([
+                    'image' => $image
+                ], [
+                    'image' => ['image', 'max: 10240']
+                ]);
+
+                /**
+                 * Associate the image to the post then upload the file.
+                 */
+                $post->addMedia($image)
+                    ->toMediaCollection('images');
+            }
+
+            return $post;
         });
 
         return new PostResource($post);
@@ -90,5 +120,48 @@ class PostsController extends Controller
         $post->delete();
 
         return response([], 204);
+    }
+
+    /**
+     * Creates a new Post model
+     */
+    public function like(Post $post)
+    {
+        /**
+         * Check if the post exists
+         */
+        if ($post === null) {
+            return response()->json([
+                'message' =>  'Post does not exist.'
+            ], 404);
+        }
+
+        Like::create([
+            'post_id' => $post->getKey(),
+            'user_id' => Auth::user()->getKey()
+        ]);
+
+        return response()->json(new PostResource($post), 200);
+    }
+
+    /**
+     * Creates a new Post model
+     */
+    public function dislike(Post $post)
+    {
+        /**
+         * Check if the post exists
+         */
+        if ($post === null) {
+            return response()->json([
+                'message' =>  'Post does not exist.'
+            ], 404);
+        }
+
+        $post->likes()
+            ->where('user_id', Auth::user()->getKey())
+            ->delete();
+
+        return response()->json(new PostResource($post), 200);
     }
 }

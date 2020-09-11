@@ -39,11 +39,11 @@ class Post extends Model implements HasMedia
     }
 
     /**
-     * Returns the realted Post model
+     * Returns the related Like model
      */
-    public function parent()
+    public function likes()
     {
-        return $this->belongsTo(Post::class, 'parent_id', 'id');
+        return $this->hasMany(Like::class);
     }
 
     /**
@@ -52,6 +52,15 @@ class Post extends Model implements HasMedia
     public function tags()
     {
         return $this->hasMany(Tag::class, 'post_id', 'id');
+    }
+
+    /**
+     * Returns true if a Like instance exists between this Post and the user parameter
+     */
+    public function isLiked($user)
+    {
+        return $this->likes()->where('user_id', $user->getKey())
+            ->exists();
     }
 
     /**

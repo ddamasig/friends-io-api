@@ -6,6 +6,7 @@ use Core\Models\User;
 use Faker\Generator as Faker;
 use Illuminate\Support\Str;
 use phpDocumentor\Reflection\DocBlock\Tag;
+use Post\Models\Like;
 use Post\Models\Post;
 
 /*
@@ -26,7 +27,14 @@ $factory->define(Post::class, function (Faker $faker) {
     ];
 });
 
-$factory->define(Tag::class, function (Faker $faker) {
+$factory->define(Tag::class, function () {
+    return [
+        'post_id' => factory(Post::class)->create()->getKey(),
+        'user_id' => factory(User::class)->create()->getKey(),
+    ];
+});
+
+$factory->define(Like::class, function () {
     return [
         'post_id' => factory(Post::class)->create()->getKey(),
         'user_id' => factory(User::class)->create()->getKey(),

@@ -4,6 +4,7 @@ use Core\Models\User;
 use Post\Models\Post;
 use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
+use Post\Models\Like;
 
 class PostSeeder extends Seeder
 {
@@ -14,7 +15,7 @@ class PostSeeder extends Seeder
      */
     public function run()
     {
-        $posts = factory(Post::class, 35)->create();
+        $posts = factory(Post::class, 15)->create();
 
         $faker = Faker::create();
 
@@ -32,13 +33,17 @@ class PostSeeder extends Seeder
                 ]);
 
                 $post->tags()->create([
-                    'user_id' => $friend->user_id
+                    'user_id' => $friend->user_id,
+                    'post_id' => $post->getKey()
                 ]);
             }
 
-            User::first()->friends()->create([
-                'user_id' => factory(User::class)->create()->getKey()
-            ]);
+            for ($i = 0; $i < rand(0, 20); $i++) {
+                $post->likes()->create([
+                    'post_id' => $post->getKey(),
+                    'user_id' => $user->getKey()
+                ]);
+            }
         }
     }
 }

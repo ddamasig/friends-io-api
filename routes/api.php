@@ -28,6 +28,8 @@ Route::group([
     Route::get('friends', 'ProfileController@friends')->name('friends');
 
     Route::apiResource('posts', 'PostsController');
+    Route::post('posts/{post}/like', 'PostsController@like')->name('posts.like');
+    Route::post('posts/{post}/dislike', 'PostsController@dislike')->name('posts.dislike');
 
     Route::group([
         'namespace' => 'Core',
