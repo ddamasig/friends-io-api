@@ -69,24 +69,26 @@ class PostsController extends Controller
                 'uploader_id' => Auth::user()->getKey()
             ]);
 
-            /**
-             * Loop through each image
-             */
-            foreach ($request->images as $image) {
+            if ($request->images) {
                 /**
-                 * Validate the image
+                 * Loop through each image
                  */
-                Validator::make([
-                    'image' => $image
-                ], [
-                    'image' => ['image', 'max: 10240']
-                ]);
+                foreach ($request->images as $image) {
+                    /**
+                     * Validate the image
+                     */
+                    Validator::make([
+                        'image' => $image
+                    ], [
+                        'image' => ['image', 'max: 10240']
+                    ]);
 
-                /**
-                 * Associate the image to the post then upload the file.
-                 */
-                $post->addMedia($image)
-                    ->toMediaCollection('images');
+                    /**
+                     * Associate the image to the post then upload the file.
+                     */
+                    $post->addMedia($image)
+                        ->toMediaCollection('images');
+                }
             }
 
             return $post;
