@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Core\Resources\UserResource;
+use App\Notifications\LikeNotification;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
@@ -142,6 +142,10 @@ class PostsController extends Controller
             'post_id' => $post->getKey(),
             'user_id' => Auth::user()->getKey()
         ]);
+
+        $post->uploader->notify(new LikeNotification(
+            sprintf('%s liked your post.', Auth::user()->name)
+        ));
 
         return response()->json(new PostResource($post), 200);
     }

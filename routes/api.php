@@ -26,6 +26,7 @@ Route::group([
     Route::post('refresh', 'AuthController@refresh')->name('refresh');
     Route::get('profile', 'ProfileController@profile')->name('profile');
     Route::get('friends', 'ProfileController@friends')->name('friends');
+    Route::get('notifications', 'NotificationsController@index')->name('index');
 
     Route::apiResource('posts', 'PostsController');
     Route::post('posts/{post}/like', 'PostsController@like')->name('posts.like');
