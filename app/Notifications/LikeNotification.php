@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -12,17 +13,17 @@ class LikeNotification extends Notification
     use Queueable;
 
     protected $message;
-    protected $link;
+    protected $post;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($message, $link = null)
+    public function __construct($message, $post = null)
     {
         $this->message = $message;
-        $this->link = $link;
+        $this->post = $post;
     }
 
     /**
@@ -33,7 +34,7 @@ class LikeNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -61,7 +62,22 @@ class LikeNotification extends Notification
         return [
             'type' => 'LikeNotification',
             'message' => $this->message,
-            'link' => $this->link
+            'post' => $this->post
         ];
+    }
+
+    /**
+     * Get the broadcastable representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return BroadcastMessage
+     */
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage([
+            'type' => 'LikeNotification',
+            'message' => $this->message,
+            'post' => $this->post
+        ]);
     }
 }

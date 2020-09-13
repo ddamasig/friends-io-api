@@ -42,4 +42,16 @@ class ProfileController extends Controller
                 ->jsonPaginate()
         );
     }
+
+    /**
+     * Returns a collection of User models not linked to the logged in user by Friends model
+     */
+    public function people(): JsonResource
+    {
+        return UserResource::collection(
+            QueryBuilder::for(User::class)
+                ->whereNotIn('id', Auth::user()->friends->pluck('user_id'))
+                ->jsonPaginate()
+        );
+    }
 }

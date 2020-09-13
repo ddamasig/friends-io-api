@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\LikeEvent;
 use App\Http\Controllers\Controller;
 use App\Notifications\LikeNotification;
 use Illuminate\Http\Request;
@@ -144,7 +145,13 @@ class PostsController extends Controller
         ]);
 
         $post->uploader->notify(new LikeNotification(
-            sprintf('%s liked your post.', Auth::user()->name)
+            sprintf('%s liked your post.', Auth::user()->name),
+            $post
+        ));
+
+        event(new LikeEvent(
+            sprintf('%s liked your post.', Auth::user()->name),
+            $post
         ));
 
         return response()->json(new PostResource($post), 200);
