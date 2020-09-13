@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use Core\Models\FriendRequest;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -10,26 +11,23 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Post\Models\Like;
-use Post\Resources\PostResource;
 
-class LikeEvent implements ShouldBroadcastNow
+class FriendRequestUpdateStatusEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-
-    protected $message;
-    protected $post;
+    
+    protected $friendRequest;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(String $message, Like $like)
+    public function __construct(FriendRequest $friendRequest)
     {
-        $this->message = $message;
-        $this->like = $like;
+        $this->friendRequest = $friendRequest;
     }
 
     /**
@@ -39,7 +37,7 @@ class LikeEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new Channel(sprintf('user-channel.%s', $this->like->post->uploader_id));
+        return new Channel(sprintf('user-channel.%s', $this->friendRequest->recipient->getKey()));
     }
 
     /**
@@ -49,7 +47,7 @@ class LikeEvent implements ShouldBroadcastNow
      */
     public function broadcastAs()
     {
-        return 'LikeEvent';
+        return 'FriendRequestUpdateStatusEvent';
     }
 
     /**
@@ -60,9 +58,7 @@ class LikeEvent implements ShouldBroadcastNow
     public function broadcastWith()
     {
         return [
-            'message' => $this->message,
-            'post' => new PostResource($this->like->post),
-            'like' => $this->like,
+            'friend_request' => $this->friendRequest,
         ];
     }
 }

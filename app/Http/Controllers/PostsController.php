@@ -139,20 +139,25 @@ class PostsController extends Controller
             ], 404);
         }
 
-        Like::create([
+        $like = Like::create([
             'post_id' => $post->getKey(),
             'user_id' => Auth::user()->getKey()
         ]);
 
-        $post->uploader->notify(new LikeNotification(
-            sprintf('%s liked your post.', Auth::user()->name),
-            $post
-        ));
+        /**
+         * Only notify is the post was liked by other users
+         */
+        if (Auth::user()->getKey() !== $post->uploader_id) {
+            $post->uploader->notify(new LikeNotification(
+                sprintf('%s liked your post.', Auth::user()->name),
+                $post
+            ));
 
-        event(new LikeEvent(
-            sprintf('%s liked your post.', Auth::user()->name),
-            $post
-        ));
+            event(new LikeEvent(
+                sprintf('%s liked your post.', Auth::user()->name),
+                $like
+            ));
+        }
 
         return response()->json(new PostResource($post), 200);
     }

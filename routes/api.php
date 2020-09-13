@@ -28,6 +28,7 @@ Route::group([
     Route::get('friends', 'ProfileController@friends')->name('friends');
     Route::get('people', 'ProfileController@people')->name('people');
     Route::get('notifications', 'NotificationsController@index')->name('index');
+    Route::apiResource('friend-requests', 'FriendRequestController');
 
     Route::apiResource('posts', 'PostsController');
     Route::post('posts/{post}/like', 'PostsController@like')->name('posts.like');
