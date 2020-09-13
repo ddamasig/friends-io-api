@@ -1,11 +1,13 @@
 <?php
 
-namespace Library\Resources;
+namespace Post\Resources;
 
+use Core\Resources\MediaResource;
 use Core\Resources\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
-class MaterialResource extends JsonResource
+class PostResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,14 +19,14 @@ class MaterialResource extends JsonResource
     {
         return [
             'id'    => $this->getKey(),
-            'parent_id'    => $this->parent_id,
             'uploader_id'    => $this->uploader_id,
             'title'    => $this->title,
-            'description'    => $this->descrption,
-            'rating'    => $this->rating,
-            'date_published'    => $this->date_published->toISO8601String(),
+            'description'    => $this->description,
             'uploader'  => $this->whenLoaded('uploader', new UserResource($this->uploader)), 
-            'parent'  => $this->whenLoaded('parent', new MaterialResource($this->parent)), 
+            'likes_count'  => $this->likes()->count(),
+            'is_liked'  => $this->isLiked(Auth::user()),
+            'images'  => MediaResource::collection($this->getMedia('images')),
+            'created_at' => $this->created_at
         ];
     }
 }

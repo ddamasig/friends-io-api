@@ -47,6 +47,14 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Returns the related Friend model
+     */
+    public function friends()
+    {
+        return $this->hasMany(Friend::class, 'owner_id', 'id');
+    }
+
+    /**
      * Returns true if the user has a linked account to a specific service.
      */
     public function hasSocialLinked($service)

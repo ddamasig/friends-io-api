@@ -24,7 +24,14 @@ Route::group([
 ], function () {
     Route::post('logout', 'AuthController@logout')->name('logout');
     Route::post('refresh', 'AuthController@refresh')->name('refresh');
-    Route::get('profile', 'AuthController@profile')->name('profile');
+    Route::get('profile', 'ProfileController@profile')->name('profile');
+    Route::get('friends', 'ProfileController@friends')->name('friends');
+    Route::get('people', 'ProfileController@people')->name('people');
+    Route::get('notifications', 'NotificationsController@index')->name('index');
+
+    Route::apiResource('posts', 'PostsController');
+    Route::post('posts/{post}/like', 'PostsController@like')->name('posts.like');
+    Route::post('posts/{post}/dislike', 'PostsController@dislike')->name('posts.dislike');
 
     Route::group([
         'namespace' => 'Core',
@@ -32,13 +39,5 @@ Route::group([
         'as'    => 'core.'
     ], function () {
         Route::apiResource('users', 'UsersController');
-    });
-
-    Route::group([
-        'namespace' => 'Library',
-        'prefix'    => 'library',
-        'as'    => 'library.'
-    ], function () {
-        // Route::apiResource('materials', 'MaterialController');
     });
 });

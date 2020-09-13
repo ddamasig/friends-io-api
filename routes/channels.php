@@ -13,6 +13,6 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('App.User.{id}', function ($user, $id) {
+Broadcast::channel('friendsio_database_private-Core.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
